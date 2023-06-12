@@ -42,6 +42,7 @@ INCFLAGS += -I$(TOOLSDIR)
 
 #=== Configure the C++ compiler
 
+ 
 CXXFLAGS = $(OPTFLAGS) -std=c++20 $(INCFLAGS) -Wall -Wshadow -Wextra
 CXXFLAGS+= -ffast-math # see issue #117
 ifndef SYCLFLAGS
@@ -235,7 +236,7 @@ $(sycl_main): $(LIBDIR)/lib$(MG5AMC_CXXLIB).a $(LIBDIR)/lib$(MG5AMC_COMMONLIB).s
 # Generic target and build rules: objects from Fortran compilation
 $(BUILDDIR)/%.o : %.f *.inc
 	@if [ ! -d $(BUILDDIR) ]; then echo "mkdir -p $(BUILDDIR)"; mkdir -p $(BUILDDIR); fi
-	$(FC) -I. -c $< -o $@
+	$(FC) -g -I. -c $< -o $@
 
 # Generic target and build rules: objects from Fortran compilation
 ###$(BUILDDIR)/%.o : %.f *.inc
@@ -255,7 +256,8 @@ $(BUILDDIR)/%.o : %.f *.inc
 
 $(fsycl_main): LIBFLAGS += $(CXXLIBFLAGSRPATH) # avoid the need for LD_LIBRARY_PATH
 $(fsycl_main): $(BUILDDIR)/fcheck_sa.o $(BUILDDIR)/fsampler.o $(LIBDIR)/lib$(MG5AMC_CXXLIB).a $(LIBDIR)/lib$(MG5AMC_COMMONLIB).so
-	$(CXX) $(SYCLFLAGS) -o $@ $(BUILDDIR)/fcheck_sa.o $(BUILDDIR)/fsampler.o $(LIBDIR)/lib$(MG5AMC_CXXLIB).a $(LIBFLAGS) -lgfortran -L$(LIBDIR) -l$(MG5AMC_COMMONLIB) -lstdc++fs
+	$(CXX) $(CXXFLAGS) $(SYCLFLAGS) -fPIC -o $@ $(BUILDDIR)/fcheck_sa.o $(BUILDDIR)/fsampler.o $(LIBDIR)/lib$(MG5AMC_CXXLIB).a $(LIBFLAGS) -lgfortran -L$(LIBDIR) -l$(MG5AMC_COMMONLIB) -lstdc++fs
+	#$(CXX) $(SYCLFLAGS) -o $@ $(BUILDDIR)/fcheck_sa.o $(BUILDDIR)/fsampler.o $(LIBDIR)/lib$(MG5AMC_CXXLIB).a $(LIBFLAGS) -lgfortran -L$(LIBDIR) -l$(MG5AMC_COMMONLIB) -lstdc++fs
 
 #-------------------------------------------------------------------------------
 

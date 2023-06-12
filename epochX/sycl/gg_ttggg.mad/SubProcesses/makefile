@@ -88,7 +88,7 @@ all: $(PROG) $(SYCL_BUILDDIR)/c$(PROG)_sycl $(SYCL_BUILDDIR)/g$(PROG)_sycl
 endif
 
 $(PROG): $(PROCESS) $(DSIG) auto_dsig.o $(LIBS) $(MATRIX) counters.o
-	$(FC) -o $(PROG) $(PROCESS) $(DSIG) auto_dsig.o $(MATRIX) $(LINKLIBS) $(LDFLAGS) $(BIASDEPENDENCIES) -fopenmp counters.o
+	$(FC) -o $(PROG) $(PROCESS) $(DSIG) auto_dsig.o  counters.o  -fopenmp  $(MATRIX) $(LINKLIBS) $(LDFLAGS) -lstdc++ -lgfortran $(BIASDEPENDENCIES) 
 
 $(LIBS): .libs
 
@@ -114,13 +114,13 @@ else
 endif
 
 $(SYCL_BUILDDIR)/c$(PROG)_sycl: $(PROCESS) $(DSIG_sycl) auto_dsig.o $(LIBS) $(MATRIX) counters.o $(SYCL_BUILDDIR)/.sycllibs
-	$(CXX) $(SYCLFLAGS) -o $(SYCL_BUILDDIR)/c$(PROG)_sycl $(PROCESS) $(DSIG_sycl) auto_dsig.o $(MATRIX) $(LIBDIR)/$(SYCL_BUILDDIR)/lib$(SYCL_CXXLIB).a $(LINKLIBS) $(LDFLAGS) $(BIASDEPENDENCIES) -fopenmp counters.o -lgfortran -L$(LIBDIR)/$(SYCL_BUILDDIR) -l$(SYCL_COMMONLIB) $(LIBFLAGSRPATH) -lstdc++fs
+	$(CXX) $(SYCLFLAGS) -o $(SYCL_BUILDDIR)/c$(PROG)_sycl $(PROCESS) $(DSIG_sycl) auto_dsig.o counters.o $(MATRIX) $(LIBDIR)/$(SYCL_BUILDDIR)/lib$(SYCL_CXXLIB).a $(LINKLIBS) $(LDFLAGS) $(BIASDEPENDENCIES) -L$(LIBDIR)/$(SYCL_BUILDDIR) -l$(SYCL_COMMONLIB) $(LIBFLAGSRPATH) -lstdc++fs -lstdc++ -lgfortran
 
 $(SYCL_BUILDDIR)/g$(PROG)_sycl: $(PROCESS) $(DSIG_sycl) auto_dsig.o $(LIBS) $(MATRIX) counters.o $(SYCL_BUILDDIR)/.sycllibs
-	$(CXX) $(SYCLFLAGS) -o $(SYCL_BUILDDIR)/g$(PROG)_sycl $(PROCESS) $(DSIG_sycl) auto_dsig.o $(MATRIX) $(LIBDIR)/$(SYCL_BUILDDIR)/lib$(SYCL_SYCLLIB).a $(LINKLIBS) $(LDFLAGS) $(BIASDEPENDENCIES) -fopenmp counters.o -lgfortran -L$(LIBDIR)/$(SYCL_BUILDDIR) -l$(SYCL_COMMONLIB) $(LIBFLAGSRPATH) -lstdc++fs
+	$(CXX) $(SYCLFLAGS) -o $(SYCL_BUILDDIR)/g$(PROG)_sycl $(PROCESS) $(DSIG_sycl) auto_dsig.o counters.o $(MATRIX) $(LIBDIR)/$(SYCL_BUILDDIR)/lib$(SYCL_SYCLLIB).a $(LINKLIBS) $(LDFLAGS) $(BIASDEPENDENCIES) -L$(LIBDIR)/$(SYCL_BUILDDIR) -l$(SYCL_COMMONLIB) $(LIBFLAGSRPATH) -lstdc++fs -lstdc++ -lgfortran
 
 counters.o: counters.cpp timer.h
-	$(CXX) -std=c++11 -Wall -Wshadow -Wextra -c $< -o $@
+	$(CXX) -fPIE -fPIC -std=c++11 -Wall -Wshadow -Wextra -c $< -o $@
 
 $(PROG)_forhel: $(PROCESS) auto_dsig.o $(LIBS) $(MATRIX_HEL)
 	$(FC) -o $(PROG)_forhel $(PROCESS) $(MATRIX_HEL) $(LINKLIBS) $(LDFLAGS) $(BIASDEPENDENCIES) -fopenmp
